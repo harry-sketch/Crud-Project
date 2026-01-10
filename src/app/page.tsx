@@ -1,44 +1,50 @@
-import Link from "next/link";
-
-import { HydrateClient } from "~/trpc/server";
+import { desc } from "drizzle-orm";
+import { db } from "~/server/db";
+import { posts } from "~/server/db/schema";
+import { addTodo } from "~/app/actions";
 
 export default async function Home() {
+  const toDos = await db.select().from(posts).orderBy(desc(posts.createdAt));
+
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="font-extrabold text-5xl tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
+    <div className="mx-auto max-w-5xl px-4 py-10 space-y-6">
+      <h1 className="text-3xl font-semibold tracking-tight text-neutral-900">
+        Things to do
+      </h1>
+
+      <form
+        action={addTodo}
+        className="flex gap-2 rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm"
+      >
+        <input
+          name="title"
+          required
+          placeholder="What needs to be done?"
+          className="w-full rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-400"
+        />
+        <button className="rounded-2xl bg-neutral-900 px-5 py-3 text-sm font-medium text-white hover:bg-neutral-800">
+          Add
+        </button>
+      </form>
+
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold text-neutral-900">
+          Your work for today
+        </h2>
+
+        {toDos.length === 0 ? (
+          <p className="text-sm text-neutral-500">No work for today 🎉</p>
+        ) : (
+          toDos.map((t) => (
+            <div
+              key={t.id}
+              className="rounded-3xl border border-neutral-200 bg-white p-5"
             >
-              <h3 className="font-bold text-2xl">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="font-bold text-2xl">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white"></p>
-          </div>
-        </div>
-      </main>
-    </HydrateClient>
+              <p className="text-sm font-medium text-neutral-900">{t.name}</p>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
