@@ -1,7 +1,7 @@
 import { desc } from "drizzle-orm";
 import { db } from "~/server/db";
 import { posts } from "~/server/db/schema";
-import { addTodo } from "~/app/actions";
+import { addTodo, deleteTodo } from "~/app/actions";
 
 export default async function Home() {
   const toDos = await db.select().from(posts).orderBy(desc(posts.createdAt));
@@ -33,18 +33,24 @@ export default async function Home() {
         </h2>
 
         {toDos.length === 0 ? (
-          <p className="text-sm text-neutral-500">No work for today 🎉</p>
+          <p className="text-sm text-neutral-500">No work for today </p>
         ) : (
           toDos.map((t) => (
-            <div
-              key={t.id}
-              className="rounded-3xl border border-neutral-200 bg-white p-5"
-            >
-              <p className="text-sm font-medium text-neutral-900">{t.name}</p>
-            </div>
-          ))
-        )}
-      </div>
+          <div 
+          key={t.id}
+    className="flex items-center justify-between gap-4 rounded-3xl border border-neutral-200 bg-white p-5">
+    <p className="text-sm font-medium text-neutral-900">{t.name}</p>
+    <form action={deleteTodo.bind(null, t.id)}>
+      <button
+        type="submit"
+        className="rounded-2xl bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700">
+        Remove
+      </button>
+     </form>
     </div>
-  );
+    ))        
+  )}  
+  </div>
+</div>
+);
 }

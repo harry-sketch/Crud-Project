@@ -16,3 +16,8 @@ export async function addTodo(formData: FormData) {
   });
   revalidatePath('/');
 }
+
+export async function deleteTodo(id: number): Promise<void> {
+  await db.delete(posts).where(eq(posts.id, id));
+  revalidatePath("/");
+}
