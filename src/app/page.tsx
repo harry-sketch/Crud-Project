@@ -1,44 +1,24 @@
-import Link from "next/link";
-
-import { HydrateClient } from "~/trpc/server";
+import { api } from "~/trpc/server";
+import CreateToDo from "./_components/CreateToDo";
+import Header from "./_components/Header";
+import ToDoList from "./_components/ToDoList";
 
 export default async function Home() {
+  const toDos = await api.post.getAll();
+
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="font-extrabold text-5xl tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
-            >
-              <h3 className="font-bold text-2xl">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="font-bold text-2xl">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white"></p>
-          </div>
+    <div className="relative min-h-screen bg-black overflow-hidden">
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-red-950/20 to-black"></div>
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+      
+      <div className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          <Header />
+          <CreateToDo />
+          <ToDoList toDos={toDos} />
         </div>
-      </main>
-    </HydrateClient>
+      </div>
+    </div>
   );
 }
