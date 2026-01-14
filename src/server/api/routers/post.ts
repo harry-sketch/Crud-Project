@@ -4,79 +4,79 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { posts } from "~/server/db/schema";
 
 export const postRouter = createTRPCRouter({
-  create: publicProcedure
-    .input(
-      z.object({
-        name: z.string(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const [newPost] = await ctx.db
-        .insert(posts)
-        .values({
-          name: input.name,
-        })
-        .returning();
-      
-      return newPost;
-    }),
+	create: publicProcedure
+		.input(
+			z.object({
+				name: z.string(),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const [newPost] = await ctx.db
+				.insert(posts)
+				.values({
+					name: input.name,
+				})
+				.returning();
 
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    return await ctx.db.query.posts.findMany({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-    });
-  }),
+			return newPost;
+		}),
 
-  getById: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .query(async ({ ctx, input }) => {
-      const post = await ctx.db.query.posts.findFirst({
-        where: (posts, { eq }) => eq(posts.id, input.id),
-      });
+	getAll: publicProcedure.query(async ({ ctx }) => {
+		return await ctx.db.query.posts.findMany({
+			orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+		});
+	}),
 
-      if (!post) {
-        throw new Error("Not found");
-      }
+	getById: publicProcedure
+		.input(z.object({ id: z.number() }))
+		.query(async ({ ctx, input }) => {
+			const post = await ctx.db.query.posts.findFirst({
+				where: (posts, { eq }) => eq(posts.id, input.id),
+			});
 
-      return post;
-    }),
+			if (!post) {
+				throw new Error("Not found");
+			}
 
-  update: publicProcedure
-    .input(
-      z.object({
-        id: z.number(),
-        name: z.string().min(1).max(256),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      const [updatedPost] = await ctx.db
-        .update(posts)
-        .set({
-          name: input.name,
-          updatedAt: new Date(),
-        })
-        .where(eq(posts.id, input.id))
-        .returning();
+			return post;
+		}),
 
-      if (!updatedPost) {
-        throw new Error("Not found");
-      }
+	update: publicProcedure
+		.input(
+			z.object({
+				id: z.number(),
+				name: z.string().min(1).max(256),
+			}),
+		)
+		.mutation(async ({ ctx, input }) => {
+			const [updatedPost] = await ctx.db
+				.update(posts)
+				.set({
+					name: input.name,
+					updatedAt: new Date(),
+				})
+				.where(eq(posts.id, input.id))
+				.returning();
 
-      return updatedPost;
-    }),
+			if (!updatedPost) {
+				throw new Error("Not found");
+			}
 
-  delete: publicProcedure
-    .input(z.object({ id: z.number() }))
-    .mutation(async ({ ctx, input }) => {
-      const [removedToDo] = await ctx.db
-        .delete(posts)
-        .where(eq(posts.id, input.id))
-        .returning();
+			return updatedPost;
+		}),
 
-      if (!removedToDo) {
-        throw new Error("Not found");
-      }
+	delete: publicProcedure
+		.input(z.object({ id: z.number() }))
+		.mutation(async ({ ctx, input }) => {
+			const [removedToDo] = await ctx.db
+				.delete(posts)
+				.where(eq(posts.id, input.id))
+				.returning();
 
-      return removedToDo;
-    }),
+			if (!removedToDo) {
+				throw new Error("Not found");
+			}
+
+			return removedToDo;
+		}),
 });
